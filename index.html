@@ -28,45 +28,152 @@
 <body>
   <fieldset>
     <legend>Error Calculator</legend>
-    <input type="number" name="first-num" id="first-num" />
+    <input type="text" name="first-num" id="first-num" />
     <select name="operator" id="operator">
       <option>+</option>
       <option>-</option>
       <option>*</option>
       <option>/</option>
     </select>
-    <input type="number" name="second-num" id="second-num" />
+    <input type="text" name="second-num" id="second-num" />
     <button id="calculate">Calculate</button>
     <br />
     <output></output>
   </fieldset>
 
   <section id="error-btns">
-    <button>Console Log Demo</button>
-    <button>Console Error Demo</button>
-    <button>Console Dir</button>
-    <button>Console dirxml</button>
-    <button>Console Group Start</button>
-    <button>Console Group End</button>
-    <button>Console Table</button>
-    <button>Start Timer</button>
-    <button>End Timer</button>
-    <button>Console Trace</button>
-    <button>Trigger a Global Error</button>
+    <button id="c-log">Console Log Demo</button>
+    <button id="c-err">Console Error Demo</button>
+    <button id="c-dir">Console Dir</button>
+    <button id="c-dirxml">Console dirxml</button>
+    <button id="c-gs">Console Group Start</button>
+    <button id="c-ge">Console Group End</button>
+    <button id="c-table">Console Table</button>
+    <button id="start-timer">Start Timer</button>
+    <button id="end-timer">End Timer</button>
+    <button id="c-trace">Console Trace</button>
+    <button id="trigger">Trigger a Global Error</button>
   </section>
 
+  <script src="https://cdn.trackjs.com/agent/v3/latest/t.js"></script>
   <script>
+    window.TrackJS && TrackJS.install({ 
+      token: "8fe6c32665c742b995ef4b6336b9da6d"
+      // for more configuration options, see https://docs.trackjs.com
+    });
+  </script>
+
+  <script>
+    
+    class ConversionError extends Error {
+      constructor(message) {
+        super(message);
+        this.name = "ConversionError";
+      }
+    }
     let calculateBtn = document.querySelector('#calculate');
+
     calculateBtn.addEventListener('click', () => {
       let output = document.querySelector('output');
       let firstNum = document.querySelector('#first-num').value;
       let secondNum = document.querySelector('#second-num').value;
       let operator = document.querySelector('#operator').value;
-      output.innerHTML = eval(`${firstNum} ${operator} ${secondNum}`);
+
+      try {
+        output.innerHTML = eval(`${firstNum} ${operator} ${secondNum}`);
+      } catch {
+        if ( isNaN(firstNum) || isNaN(secondNum) )  {
+          throw new ConversionError("Input(s) must be of type number");
+        }
+        
+        if ( firstNum == "" && secondNum == "") {
+          output.textContent = 0;
+        }
+      } finally {
+        console.log("All errors are handled!");
+      }
+
     });
 
     let errorBtns = Array.from(document.querySelectorAll('#error-btns > button'));
+    
     // TODO - Make buttons functional
+
+    let cLog = document.querySelector('#c-log');
+    cLog.addEventListener('click', () => {
+      console.log("Console Log");
+    });
+
+    let cError = document.querySelector('#c-err');
+    cError.addEventListener('click', () => {
+      console.error("Console Error");
+    });
+
+    let cDir = document.querySelector('#c-dir');
+    cDir.addEventListener('click', () => {
+      console.dir(document.body);
+    });
+    
+    let cDirxml = document.querySelector('#c-dirxml');
+    cDirxml.addEventListener('click', () => {
+      console.dirxml(document.body);
+    });
+    
+    let cGroupStart = document.querySelector('#c-gs');
+    cGroupStart.addEventListener('click', () => {
+      console.group("Log group:");
+    });
+    
+    let cGroupEnd = document.querySelector('#c-ge');
+    cGroupEnd.addEventListener('click', () => {
+      console.groupEnd();
+    });
+    
+    let cTable = document.querySelector('#c-table');
+    cTable.addEventListener('click', () => {
+      console.table([
+      {
+        Course: 'Software Engineering',
+        ID: 'CSE 110',
+      },
+      {
+        Course: 'Design & Analysis of Algorithm',
+        ID: 'CSE 101',
+      },
+      {
+        Course: 'Programming Language',
+        ID: 'CSE 130',
+      }
+      ]);
+    });
+
+    let cTimeStart = document.querySelector('#start-timer');
+    cTimeStart.addEventListener('click', () => {
+      console.log("Timer starts");
+      console.time();
+    });
+
+    let cTimeEnd = document.querySelector('#end-timer');
+    cTimeEnd.addEventListener('click', () => {
+      console.timeEnd();
+      console.log("Timer ends");
+    });
+
+    let cTrace = document.querySelector('#c-trace');
+    cTrace.addEventListener('click', () => {
+      const first = () => { second(); };
+      const second = () => { third(); };
+      const third = () => { fourth(); };
+      const fourth = () => { console.trace(); };
+      first();
+    });
+
+    let trigger = document.querySelector('#trigger');
+    trigger.addEventListener('click', () => {
+      
+    });
+
   </script>
+                        
 </body>
 </html>
